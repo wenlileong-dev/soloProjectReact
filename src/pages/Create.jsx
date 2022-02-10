@@ -17,6 +17,8 @@ const Create = () => {
   const [codetags, setcodeTags] = useState([]);
 
   const createCodeSnippet = async (e) => {
+    // TODO Post Request to add code snippet into the database
+    // TODO If the tag not exist, add them to the database
     e.preventDefault();
     let codeSnippet = { title, description, code, codetags };
     let stringi = JSON.stringify(codeSnippet);

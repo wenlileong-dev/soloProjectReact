@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -7,6 +7,7 @@ import CardActions from "@mui/material/CardActions";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -26,10 +27,16 @@ const ExpandMore = styled((props) => {
 }));
 
 const ExploreCodes = (props) => {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [isFavourite, setIsFavourite] = useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+  };
+
+  const handleFavourite = () => {
+    setIsFavourite(!isFavourite);
+    // TODO add to favourite
   };
   return (
     <React.Fragment>
@@ -48,7 +55,11 @@ const ExploreCodes = (props) => {
           </CardContent>
           <CardActions disableSpacing>
             <IconButton aria-label="add to favorites">
-              <FavoriteIcon />
+              {isFavourite ? (
+                <FavoriteIcon onClick={handleFavourite} />
+              ) : (
+                <FavoriteBorderIcon onClick={handleFavourite} />
+              )}
             </IconButton>
             <ExpandMore
               expand={expanded}

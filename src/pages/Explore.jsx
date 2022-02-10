@@ -11,8 +11,11 @@ import ExploreTags from "../components/ExploreTags";
 const Explore = () => {
   const [selectTagList, setSelectTagList] = useState([]);
 
+  // TODO GET Request to get all code snippets which are public
+
   useEffect(() => {
     console.log(selectTagList);
+    // TODO GET Request to filter code snippets by selected tags
   }, [selectTagList]);
 
   const addTag = (tag) => {
