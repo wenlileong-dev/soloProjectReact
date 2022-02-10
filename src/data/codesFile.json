@@ -1,0 +1,26 @@
+[
+  {
+    "title": "title",
+    "description": "description",
+    "code": "public class JpaDatabaseProperties {\n    // MAC URL => /Users/matthew.hircock/database-login.properties\n    private static final String PROP_FILE_LOCATION = \"D:\\\\career\\\\FDM\\\\Java\\\\jpa.relationship\\\\src\\\\main\\\\resources\\\\user-login.properties\";\n    public static Map<String, String> getProperties() {\n        Map<String, String> properties = new HashMap<>();\n        Properties props = new Properties();\n        try {\n            props.load(new FileInputStream(PROP_FILE_LOCATION));\n        } catch (FileNotFoundException e) {\n            System.out.println(\"Properties file not found - \" + e.getMessage());\n        } catch (IOException e) {\n            System.out.println(\"Unable to load properties file - \" + e.getMessage());\n        }\n        String username = (String) props.get(\"username\");\n        String password = (String) props.get(\"password\");\n        properties.put(\"javax.persistence.jdbc.user\", username);\n        properties.put(\"javax.persistence.jdbc.password\", password);\n        return properties;\n    }",
+    "codetags": ["tag1", "java"]
+  },
+  {
+    "title": "title2",
+    "description": "description2",
+    "code": "\tpublic ConnectionPool() {\n\t\tsuper();\n\t\ttry {\n\t\t\tfor(int i = 0; i < 10; i++) {\n\t\t\t\tConnection conn = DriverManager.getConnection(URL, USERNAME, PASSWord);\n\t\t\t\tfreeConnections.add(conn);\n\t\t\t}\n\t\t} catch (SQLException e) {\n\t\t\te.getMessage();\n\t\t}\n\t}",
+    "codetags": ["java", "tag2"]
+  },
+  {
+    "title": "Title 3",
+    "description": "Description 3",
+    "code": "\tpublic Connection getConnection() throws RuntimeException{\n\t\tConnection conn = null;\n\t\tif(!freeConnections.isEmpty()) {\n\t\t\tconn = freeConnections.get(freeConnections.size() - 1);\n\t\t\tfreeConnections.remove(freeConnections.size() - 1);\n\t\t\tusedConnections.add(conn);\n\t\t} else {\n\t\t\tthrow new RuntimeException(\"Max 10 Connections in use!\");\n\t\t}\n\t\treturn conn;\n\t}",
+    "codetags": ["tag1", "Connection"]
+  },
+  {
+    "title": "Title 4",
+    "description": "Description 4",
+    "code": "\tpublic void closeAllConnections() {\n\t\tfor (Connection connection : freeConnections) {\n\t\t\ttry {\n\t\t\t\tconnection.close();\n\t\t\t} catch (SQLException e) {\n\t\t\t\te.printStackTrace();\n\t\t\t}\n\t\t}\n\t\t\n\t\tfor (Connection connection : usedConnections) {\n\t\t\ttry {\n\t\t\t\tconnection.close();\n\t\t\t} catch (SQLException e) {\n\t\t\t\t// TODO Auto-generated catch block\n\t\t\t\te.printStackTrace();\n\t\t\t}\n\t\t}\n\t}",
+    "codetags": ["Connection", "tag2"]
+  }
+]
