@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import NavigationBar from "../components/nav/NavigationBar";
 import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
@@ -9,12 +10,16 @@ import ExploreCodes from "../components/ExploreCodes";
 import allCodes from "./../data/codesFile.json";
 import tags from "../data/tagsFile.json";
 
-const MySnippet = () => {
+const MySnippet = ({ cookies }) => {
+  let navigate = useNavigate();
   const [selectTagList, setSelectTagList] = useState([]);
 
   // TODO GET Request to get all code snippets created by user or is saved by the user
 
   useEffect(() => {
+    if (!cookies.get("UserID")) {
+      navigate("/auth");
+    }
     console.log(selectTagList);
     // TODO GET Request to filter code snippets by selected tags
   }, [selectTagList]);
@@ -27,7 +32,7 @@ const MySnippet = () => {
   };
   return (
     <React.Fragment>
-      <NavigationBar />
+      <NavigationBar cookies={cookies} />
       <Stack direction="row" spacing={2} mt={3} mb={3}>
         {tags.map((tag) => {
           return (

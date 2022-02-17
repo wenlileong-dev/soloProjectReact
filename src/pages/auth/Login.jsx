@@ -8,7 +8,7 @@ import axios from "axios";
 import Signup from "./Signup";
 import "./auth.css";
 
-const Login = () => {
+const Login = ({ cookies }) => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -22,8 +22,11 @@ const Login = () => {
       "http://localhost:8088/codeSnippetManager/users/login",
       user
     );
-    console.log(result.headers.authorization);
-    console.log(result.headers.userid);
+    cookies.set("Authorization", result.headers.authorization);
+    cookies.set("UserID", result.headers.userid);
+    setEmail("");
+    setPassword("");
+    window.location.href = "/";
   };
 
   return (

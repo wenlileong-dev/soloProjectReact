@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import NavigationBar from "../components/nav/NavigationBar";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -10,11 +11,18 @@ import Button from "@mui/material/Button";
 
 var tags = require("./../data/tagsFile.json");
 
-const Create = () => {
+const Create = ({ cookies }) => {
+  let navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [code, setCode] = useState(`System.out.println("Hello World")`);
   const [codetags, setcodeTags] = useState([]);
+
+  useEffect(() => {
+    if (!cookies.get("UserID")) {
+      navigate("/auth");
+    }
+  }, []);
 
   const createCodeSnippet = async (e) => {
     // TODO Post Request to add code snippet into the database
@@ -27,7 +35,7 @@ const Create = () => {
 
   return (
     <React.Fragment>
-      <NavigationBar />
+      <NavigationBar cookies={cookies} />
       <Box sx={{ flexGrow: 1 }} mt={3}>
         <form onSubmit={createCodeSnippet} autoComplete="off">
           <Grid

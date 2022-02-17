@@ -8,7 +8,12 @@ function handleClick(event) {
   event.preventDefault();
   console.info("You clicked a breadcrumb.");
 }
-const NavigationBar = () => {
+const NavigationBar = ({ cookies }) => {
+  const handleLogout = () => {
+    cookies.remove("Authorization");
+    cookies.remove("UserID");
+    window.location.href = "/";
+  };
   return (
     <div role="presentation" onClick={handleClick}>
       <Grid
@@ -26,7 +31,9 @@ const NavigationBar = () => {
           </Breadcrumbs>
         </Grid>
         <Grid item xs={3}>
-          <Button variant="contained">Logout</Button>
+          <Button variant="contained" onClick={handleLogout}>
+            Logout
+          </Button>
         </Grid>
       </Grid>
     </div>

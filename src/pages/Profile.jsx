@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import NavigationBar from "../components/nav/NavigationBar";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -12,7 +13,15 @@ import FormControl from "@mui/material/FormControl";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
 
-const Profile = () => {
+const Profile = ({ cookies }) => {
+  let navigate = useNavigate();
+
+  useEffect(() => {
+    if (!cookies.get("UserID")) {
+      navigate("/auth");
+    }
+  }, []);
+
   const [password, setPassword] = useState({
     currPassword: "",
     newPassword: "",
@@ -47,7 +56,7 @@ const Profile = () => {
   };
   return (
     <React.Fragment>
-      <NavigationBar />
+      <NavigationBar cookies={cookies} />
       <h1>Profile</h1>
       <Box
         sx={{
