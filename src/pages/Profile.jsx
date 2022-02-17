@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import NavigationBar from "../components/nav/NavigationBar";
 import Box from "@mui/material/Box";
@@ -12,13 +13,39 @@ import InputAdornment from "@mui/material/InputAdornment";
 import FormControl from "@mui/material/FormControl";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
+import Alert from "@mui/material/Alert";
 
 const Profile = ({ cookies }) => {
   let navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [isError, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  let config = {
+    headers: {
+      Authorization: cookies.get("Authorization"),
+    },
+  };
+
+  const getUserDetails = async () => {
+    let result = await axios.get(
+      `http://localhost:8088/codeSnippetManager/users/${cookies.get("UserID")}`,
+      config
+    );
+    if (result.status === 200) {
+      setEmail(result.data.email);
+    } else {
+      cookies.remove("Authorization");
+      cookies.remove("UserID");
+      window.location.href = "/";
+    }
+  };
 
   useEffect(() => {
     if (!cookies.get("UserID")) {
       navigate("/auth");
+    } else {
+      getUserDetails();
     }
   }, []);
 
@@ -48,10 +75,21 @@ const Profile = ({ cookies }) => {
 
   const handlePassword = async (e) => {
     e.preventDefault();
-    if (password.newPassword === password.repeatNewPassword) {
-      console.log(password);
+    let result = await axios.put(
+      `http://localhost:8088/codeSnippetManager/users/${cookies.get("UserID")}`,
+      password,
+      config
+    );
+    setPassword({
+      currPassword: "",
+      newPassword: "",
+      repeatNewPassword: "",
+    });
+    if (result.data.status === "success") {
+      window.location.href = "/profile";
     } else {
-      console.log("password not match");
+      setError(true);
+      setErrorMsg(result.data.msg);
     }
   };
   return (
@@ -71,8 +109,14 @@ const Profile = ({ cookies }) => {
               disabled
               id="outlined-disabled"
               label="Email"
-              defaultValue="useremail"
+              value={email}
             />
+            {isError && (
+              <Alert severity="error" sx={{ width: "50ch" }}>
+                {errorMsg}
+              </Alert>
+            )}
+
             <FormControl sx={{ m: 2, width: "50ch" }} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-password">
                 Current Password

@@ -6,7 +6,6 @@ import Button from "@mui/material/Button";
 
 function handleClick(event) {
   event.preventDefault();
-  console.info("You clicked a breadcrumb.");
 }
 const NavigationBar = ({ cookies }) => {
   const handleLogout = () => {
@@ -15,7 +14,7 @@ const NavigationBar = ({ cookies }) => {
     window.location.href = "/";
   };
   return (
-    <div role="presentation" onClick={handleClick}>
+    <div role="presentation">
       <Grid
         container
         direction="row"
