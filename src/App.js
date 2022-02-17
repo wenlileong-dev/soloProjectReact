@@ -5,6 +5,7 @@ import Create from "./pages/Create";
 import Explore from "./pages/Explore";
 import MySnippet from "./pages/MySnippets";
 import Profile from "./pages/Profile";
+import Login from "./pages/auth/Login";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/create" element={<Create />} />
         <Route path="/mySnippet" element={<MySnippet />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/auth" element={<Login />} />
       </Routes>
     </div>
   );
