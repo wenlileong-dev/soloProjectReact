@@ -48,7 +48,7 @@ const ExploreCodes = (props) => {
               {props.code.description}
             </Typography>
             <Stack direction="row" spacing={1}>
-              {props.code.codetags.map((tag) => {
+              {props.code.tagName.map((tag) => {
                 return <Chip label={tag} />;
               })}
             </Stack>

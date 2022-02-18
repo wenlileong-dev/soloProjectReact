@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import NavigationBar from "../components/nav/NavigationBar";
 import Box from "@mui/material/Box";
@@ -9,7 +10,7 @@ import Chip from "@mui/material/Chip";
 import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
 
-var tags = require("./../data/tagsFile.json");
+// var tags = require("./../data/tagsFile.json");
 
 const Create = ({ cookies }) => {
   let navigate = useNavigate();
@@ -17,20 +18,44 @@ const Create = ({ cookies }) => {
   const [description, setDescription] = useState("");
   const [code, setCode] = useState(`System.out.println("Hello World")`);
   const [codetags, setcodeTags] = useState([]);
+  const [tags, setTags] = useState([]);
+
+  let config = {
+    headers: {
+      Authorization: cookies.get("Authorization"),
+    },
+  };
+
+  const getAllTags = async () => {
+    let result = await axios.get(
+      "http://localhost:8088/codeSnippetManager/code/tags",
+      config
+    );
+    if (result.status === 200) {
+      setTags(result.data);
+    }
+  };
 
   useEffect(() => {
     if (!cookies.get("UserID")) {
       navigate("/auth");
+    } else {
+      getAllTags();
     }
   }, []);
 
   const createCodeSnippet = async (e) => {
-    // TODO Post Request to add code snippet into the database
-    // TODO If the tag not exist, add them to the database
     e.preventDefault();
-    let codeSnippet = { title, description, code, codetags };
-    let stringi = JSON.stringify(codeSnippet);
-    console.log(stringi);
+    let userId = cookies.get("UserID");
+    let codeSnippet = { title, description, code, tagName: codetags, userId };
+    let result = await axios.post(
+      "http://localhost:8088/codeSnippetManager/code",
+      codeSnippet,
+      config
+    );
+    if (result.status === 200) {
+      window.location.href = "/explore";
+    }
   };
 
   return (
