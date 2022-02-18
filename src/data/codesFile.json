@@ -23,4 +23,5 @@
     "code": "\tpublic void closeAllConnections() {\n\t\tfor (Connection connection : freeConnections) {\n\t\t\ttry {\n\t\t\t\tconnection.close();\n\t\t\t} catch (SQLException e) {\n\t\t\t\te.printStackTrace();\n\t\t\t}\n\t\t}\n\t\t\n\t\tfor (Connection connection : usedConnections) {\n\t\t\ttry {\n\t\t\t\tconnection.close();\n\t\t\t} catch (SQLException e) {\n\t\t\t\t// TODO Auto-generated catch block\n\t\t\t\te.printStackTrace();\n\t\t\t}\n\t\t}\n\t}",
     "tagName": ["Connection", "tag2"]
   }
+  
 ]
