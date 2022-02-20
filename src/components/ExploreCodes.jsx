@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { styled } from "@mui/material/styles";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -14,6 +15,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Grid from "@mui/material/Grid";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import EditCodeSnippet from "./EditCodeSnippet";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -29,6 +32,15 @@ const ExpandMore = styled((props) => {
 const ExploreCodes = (props) => {
   const [expanded, setExpanded] = useState(false);
   const [isFavourite, setIsFavourite] = useState(false);
+  const [editOpen, setEditOpen] = React.useState(false);
+  const handleEditOpen = () => setEditOpen(true);
+  const handleEditClose = () => setEditOpen(false);
+
+  let config = {
+    headers: {
+      Authorization: props.cookies.get("Authorization"),
+    },
+  };
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -37,6 +49,18 @@ const ExploreCodes = (props) => {
   const handleFavourite = () => {
     setIsFavourite(!isFavourite);
     // TODO add to favourite
+  };
+
+  const handleDelete = async () => {
+    let result = await axios.delete(
+      `http://localhost:8088/codeSnippetManager/code/my/${props.cookies.get(
+        "UserID"
+      )}/${props.code.id}`,
+      config
+    );
+    if (result.status === 200) {
+      window.location.href = "/mySnippet";
+    }
   };
   return (
     <React.Fragment>
@@ -84,8 +108,28 @@ const ExploreCodes = (props) => {
                     "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
                 }}
               />
+              <Stack
+                spacing={3}
+                direction="row"
+                justifyContent="center"
+                alignItems="center"
+                mt={3}
+              >
+                <Button onClick={handleEditOpen} variant="contained">
+                  Update
+                </Button>
+                <Button onClick={handleDelete} variant="outlined">
+                  Delete
+                </Button>
+              </Stack>
             </CardContent>
           </Collapse>
+          <EditCodeSnippet
+            open={editOpen}
+            handleClose={handleEditClose}
+            prevcode={props.code}
+            cookies={props.cookies}
+          />
         </Card>
       </Grid>
     </React.Fragment>

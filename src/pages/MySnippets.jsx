@@ -74,7 +74,9 @@ const MySnippet = ({ cookies }) => {
       </Stack>
       <Grid container spacing={2}>
         {allCodes.map((code, i) => {
-          return <ExploreCodes code={code} key={`explore: ${i}`} />;
+          return (
+            <ExploreCodes code={code} key={`explore: ${i}`} cookies={cookies} />
+          );
         })}
       </Grid>
     </React.Fragment>
