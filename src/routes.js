@@ -4,10 +4,6 @@ export const setup = () => {
   cookies = new Cookies();
 };
 
-// export const getAuthCookies = () => {
-//   return cookies.get("Authorization");
-// };
-
 export const getUserCookies = () => {
   return cookies.get("UserID");
 };
@@ -29,3 +25,5 @@ export const config = () => {
     },
   };
 };
+
+export const baseURL = "http://localhost:8088/codeSnippetManager";

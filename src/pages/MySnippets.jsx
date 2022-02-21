@@ -8,9 +8,7 @@ import Grid from "@mui/material/Grid";
 import ExploreTags from "../components/ExploreTags";
 import ExploreCodes from "../components/ExploreCodes";
 
-// import allCodes from "./../data/codesFile.json";
-// import tags from "../data/tagsFile.json";
-import { config, getUserCookies } from "./../routes";
+import { config, getUserCookies, baseURL } from "./../routes";
 
 const MySnippet = () => {
   let navigate = useNavigate();
@@ -19,10 +17,7 @@ const MySnippet = () => {
   const [allCodes, setAllCodes] = useState([]);
 
   const getAllTags = async () => {
-    let result = await axios.get(
-      "http://localhost:8088/codeSnippetManager/code/tags",
-      config()
-    );
+    let result = await axios.get(`${baseURL}/code/tags`, config());
     if (result.status === 200) {
       setTags(result.data);
     }
@@ -30,7 +25,7 @@ const MySnippet = () => {
 
   const getUserSnippets = async (selectTagList) => {
     let result = await axios.post(
-      `http://localhost:8088/codeSnippetManager/code/my/${getUserCookies()}`,
+      `${baseURL}/code/my/${getUserCookies()}`,
       { tagName: selectTagList, userId: getUserCookies() },
       config()
     );
@@ -46,8 +41,8 @@ const MySnippet = () => {
       getAllTags();
       getUserSnippets(selectTagList);
     }
-    // TODO GET Request to filter code snippets by selected tags
-  }, [selectTagList]);
+  }, [selectTagList, navigate]);
+
   const addTag = (tag) => {
     setSelectTagList([...selectTagList, tag]);
   };
@@ -55,13 +50,19 @@ const MySnippet = () => {
   const removeTag = (tag) => {
     setSelectTagList(selectTagList.filter((tagInList) => tag !== tagInList));
   };
+
   return (
     <React.Fragment>
       <NavigationBar />
       <Stack direction="row" spacing={2} mt={3} mb={3}>
-        {tags.map((tag) => {
+        {tags.map((tag, i) => {
           return (
-            <ExploreTags tag={tag.name} addTag={addTag} removeTag={removeTag} />
+            <ExploreTags
+              tag={tag.name}
+              addTag={addTag}
+              removeTag={removeTag}
+              key={`explore Tags: ${i}`}
+            />
           );
         })}
       </Stack>

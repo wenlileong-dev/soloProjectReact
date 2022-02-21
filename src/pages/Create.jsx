@@ -10,7 +10,7 @@ import Chip from "@mui/material/Chip";
 import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
 
-import { config, getUserCookies } from "./../routes";
+import { config, getUserCookies, baseURL } from "./../routes";
 
 const Create = () => {
   let navigate = useNavigate();
@@ -21,10 +21,7 @@ const Create = () => {
   const [tags, setTags] = useState([]);
 
   const getAllTags = async () => {
-    let result = await axios.get(
-      "http://localhost:8088/codeSnippetManager/code/tags",
-      config()
-    );
+    let result = await axios.get(`${baseURL}/code/tags`, config());
     if (result.status === 200) {
       setTags(result.data);
     }
@@ -36,17 +33,13 @@ const Create = () => {
     } else {
       getAllTags();
     }
-  }, []);
+  }, [navigate]);
 
   const createCodeSnippet = async (e) => {
     e.preventDefault();
     let userId = getUserCookies();
     let codeSnippet = { title, description, code, tagName: codetags, userId };
-    let result = await axios.post(
-      "http://localhost:8088/codeSnippetManager/code",
-      codeSnippet,
-      config()
-    );
+    let result = await axios.post(`${baseURL}/code`, codeSnippet, config());
     if (result.status === 200) {
       window.location.href = "/explore";
     }
@@ -66,7 +59,6 @@ const Create = () => {
           >
             <Grid item xs={9}>
               <TextField
-                id="outlined-basic"
                 label="Title"
                 variant="outlined"
                 fullWidth
@@ -78,7 +70,6 @@ const Create = () => {
             </Grid>
             <Grid item xs={9}>
               <TextField
-                id="outlined-basic"
                 label="Description"
                 variant="outlined"
                 fullWidth

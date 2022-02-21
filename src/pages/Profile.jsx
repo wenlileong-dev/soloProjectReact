@@ -15,17 +15,33 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
 import Alert from "@mui/material/Alert";
 
-import { config, getUserCookies, removeAuthCookies } from "./../routes";
+import {
+  config,
+  getUserCookies,
+  removeAuthCookies,
+  baseURL,
+} from "./../routes";
 
 const Profile = () => {
   let navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [isError, setError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [password, setPassword] = useState({
+    currPassword: "",
+    newPassword: "",
+    repeatNewPassword: "",
+  });
+
+  const [passwordVisibly, setPasswordVisibly] = useState({
+    showCurrPassword: false,
+    showNewPassword: false,
+    showRepeatNewPassword: false,
+  });
 
   const getUserDetails = async () => {
     let result = await axios.get(
-      `http://localhost:8088/codeSnippetManager/users/${getUserCookies()}`,
+      `${baseURL}/users/${getUserCookies()}`,
       config()
     );
     if (result.status === 200) {
@@ -42,19 +58,7 @@ const Profile = () => {
     } else {
       getUserDetails();
     }
-  }, []);
-
-  const [password, setPassword] = useState({
-    currPassword: "",
-    newPassword: "",
-    repeatNewPassword: "",
-  });
-
-  const [passwordVisibly, setPasswordVisibly] = useState({
-    showCurrPassword: false,
-    showNewPassword: false,
-    showRepeatNewPassword: false,
-  });
+  }, [navigate]);
 
   const handleChange = (prop) => (event) => {
     setPassword({ ...password, [prop]: event.target.value });
@@ -71,7 +75,7 @@ const Profile = () => {
   const handlePassword = async (e) => {
     e.preventDefault();
     let result = await axios.put(
-      `http://localhost:8088/codeSnippetManager/users/${getUserCookies()}`,
+      `${baseURL}/users/${getUserCookies()}`,
       password,
       config()
     );
@@ -100,12 +104,7 @@ const Profile = () => {
       >
         <form onSubmit={handlePassword}>
           <Stack spacing={3} justifyContent="center" alignItems="center">
-            <TextField
-              disabled
-              id="outlined-disabled"
-              label="Email"
-              value={email}
-            />
+            <TextField disabled label="Email" value={email} />
             {isError && (
               <Alert severity="error" sx={{ width: "50ch" }}>
                 {errorMsg}
@@ -117,7 +116,6 @@ const Profile = () => {
                 Current Password
               </InputLabel>
               <OutlinedInput
-                id="outlined-adornment-password"
                 type={passwordVisibly.showCurrPassword ? "text" : "password"}
                 value={password.currPassword}
                 onChange={handleChange("currPassword")}
@@ -146,7 +144,6 @@ const Profile = () => {
                 New Password
               </InputLabel>
               <OutlinedInput
-                id="outlined-adornment-password"
                 type={passwordVisibly.showNewPassword ? "text" : "password"}
                 value={password.newPassword}
                 onChange={handleChange("newPassword")}
@@ -174,7 +171,6 @@ const Profile = () => {
                 Repeat New Password
               </InputLabel>
               <OutlinedInput
-                id="outlined-adornment-password"
                 type={
                   passwordVisibly.showRepeatNewPassword ? "text" : "password"
                 }
