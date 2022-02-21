@@ -10,22 +10,18 @@ import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import ExploreTags from "../components/ExploreTags";
 
-const Explore = ({ cookies }) => {
+import { config, getUserCookies } from "./../routes";
+
+const Explore = () => {
   let navigate = useNavigate();
   const [selectTagList, setSelectTagList] = useState([]);
   const [allCodes, setAllCodes] = useState([]);
   const [tags, setTags] = useState([]);
 
-  let config = {
-    headers: {
-      Authorization: cookies.get("Authorization"),
-    },
-  };
-
   const getAllTags = async () => {
     let result = await axios.get(
       "http://localhost:8088/codeSnippetManager/code/tags",
-      config
+      config()
     );
     if (result.status === 200) {
       setTags(result.data);
@@ -35,8 +31,8 @@ const Explore = ({ cookies }) => {
   const getAllCodes = async (selectTagList) => {
     let result = await axios.post(
       "http://localhost:8088/codeSnippetManager/code/all",
-      { tagName: selectTagList, userId: cookies.get("UserID") },
-      config
+      { tagName: selectTagList, userId: getUserCookies() },
+      config()
     );
     if (result.status === 200) {
       // console.log(selectTagList);
@@ -47,14 +43,14 @@ const Explore = ({ cookies }) => {
 
   useEffect(() => {
     // console.log(cookies.get("UerID"));
-    if (!cookies.get("UserID")) {
+    if (!getUserCookies()) {
       navigate("/auth");
     } else {
       getAllTags();
       getAllCodes(selectTagList);
     }
     // TODO GET Request to filter code snippets by selected tags
-  }, [selectTagList, cookies]);
+  }, [selectTagList]);
 
   const addTag = (tag) => {
     setSelectTagList([...selectTagList, tag]);
@@ -66,7 +62,7 @@ const Explore = ({ cookies }) => {
 
   return (
     <React.Fragment>
-      <NavigationBar cookies={cookies} />
+      <NavigationBar />
       <Stack direction="row" spacing={2} mt={3} mb={3}>
         {tags.map((tag) => {
           return (
@@ -76,9 +72,7 @@ const Explore = ({ cookies }) => {
       </Stack>
       <Grid container spacing={2}>
         {allCodes.map((code, i) => {
-          return (
-            <ExploreCodes code={code} key={`explore: ${i}`} cookies={cookies} />
-          );
+          return <ExploreCodes code={code} key={`explore: ${i}`} />;
         })}
       </Grid>
     </React.Fragment>

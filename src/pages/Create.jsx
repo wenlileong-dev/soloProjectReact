@@ -10,9 +10,9 @@ import Chip from "@mui/material/Chip";
 import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
 
-// var tags = require("./../data/tagsFile.json");
+import { config, getUserCookies } from "./../routes";
 
-const Create = ({ cookies }) => {
+const Create = () => {
   let navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -20,16 +20,10 @@ const Create = ({ cookies }) => {
   const [codetags, setcodeTags] = useState([]);
   const [tags, setTags] = useState([]);
 
-  let config = {
-    headers: {
-      Authorization: cookies.get("Authorization"),
-    },
-  };
-
   const getAllTags = async () => {
     let result = await axios.get(
       "http://localhost:8088/codeSnippetManager/code/tags",
-      config
+      config()
     );
     if (result.status === 200) {
       setTags(result.data);
@@ -37,7 +31,7 @@ const Create = ({ cookies }) => {
   };
 
   useEffect(() => {
-    if (!cookies.get("UserID")) {
+    if (!getUserCookies()) {
       navigate("/auth");
     } else {
       getAllTags();
@@ -46,12 +40,12 @@ const Create = ({ cookies }) => {
 
   const createCodeSnippet = async (e) => {
     e.preventDefault();
-    let userId = cookies.get("UserID");
+    let userId = getUserCookies();
     let codeSnippet = { title, description, code, tagName: codetags, userId };
     let result = await axios.post(
       "http://localhost:8088/codeSnippetManager/code",
       codeSnippet,
-      config
+      config()
     );
     if (result.status === 200) {
       window.location.href = "/explore";
@@ -60,7 +54,7 @@ const Create = ({ cookies }) => {
 
   return (
     <React.Fragment>
-      <NavigationBar cookies={cookies} />
+      <NavigationBar />
       <Box sx={{ flexGrow: 1 }} mt={3}>
         <form onSubmit={createCodeSnippet} autoComplete="off">
           <Grid

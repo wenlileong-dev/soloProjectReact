@@ -9,7 +9,9 @@ import CodeEditor from "@uiw/react-textarea-code-editor";
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
 
-const EditCodeSnippet = ({ open, handleClose, cookies, prevcode }) => {
+import { config, getUserCookies } from "./../routes";
+
+const EditCodeSnippet = ({ open, handleClose, prevcode }) => {
   const [title, setTitle] = useState(prevcode.title);
   const [description, setDescription] = useState(prevcode.description);
   const [code, setCode] = useState(prevcode.code);
@@ -27,16 +29,10 @@ const EditCodeSnippet = ({ open, handleClose, cookies, prevcode }) => {
     p: 4,
   };
 
-  let config = {
-    headers: {
-      Authorization: cookies.get("Authorization"),
-    },
-  };
-
   const getAllTags = async () => {
     let result = await axios.get(
       "http://localhost:8088/codeSnippetManager/code/tags",
-      config
+      config()
     );
     if (result.status === 200) {
       setTags(result.data);
@@ -45,12 +41,12 @@ const EditCodeSnippet = ({ open, handleClose, cookies, prevcode }) => {
 
   const handleEdit = async (e) => {
     e.preventDefault();
-    let userId = cookies.get("UserID");
+    let userId = getUserCookies();
     let codeSnippet = { title, description, code, tagName, userId };
     let result = await axios.put(
       `http://localhost:8088/codeSnippetManager/code/my/${prevcode.id}`,
       codeSnippet,
-      config
+      config()
     );
     if (result.status === 200) {
       window.location.href = "/mySnippet";

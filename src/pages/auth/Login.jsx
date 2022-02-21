@@ -1,14 +1,16 @@
 import React, { useState } from "react";
+import axios from "axios";
+
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import axios from "axios";
 
+import { setAuthCookies } from "./../../routes";
 import Signup from "./Signup";
 import "./auth.css";
 
-const Login = ({ cookies }) => {
+const Login = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -22,8 +24,7 @@ const Login = ({ cookies }) => {
       "http://localhost:8088/codeSnippetManager/users/login",
       user
     );
-    cookies.set("Authorization", result.headers.authorization);
-    cookies.set("UserID", result.headers.userid);
+    setAuthCookies(result.headers.authorization, result.headers.userid);
     setEmail("");
     setPassword("");
     window.location.href = "/";

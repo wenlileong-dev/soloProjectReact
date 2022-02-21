@@ -15,34 +15,29 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
 import Alert from "@mui/material/Alert";
 
-const Profile = ({ cookies }) => {
+import { config, getUserCookies, removeAuthCookies } from "./../routes";
+
+const Profile = () => {
   let navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [isError, setError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  let config = {
-    headers: {
-      Authorization: cookies.get("Authorization"),
-    },
-  };
-
   const getUserDetails = async () => {
     let result = await axios.get(
-      `http://localhost:8088/codeSnippetManager/users/${cookies.get("UserID")}`,
-      config
+      `http://localhost:8088/codeSnippetManager/users/${getUserCookies()}`,
+      config()
     );
     if (result.status === 200) {
       setEmail(result.data.email);
     } else {
-      cookies.remove("Authorization");
-      cookies.remove("UserID");
+      removeAuthCookies();
       window.location.href = "/";
     }
   };
 
   useEffect(() => {
-    if (!cookies.get("UserID")) {
+    if (!getUserCookies()) {
       navigate("/auth");
     } else {
       getUserDetails();
@@ -76,9 +71,9 @@ const Profile = ({ cookies }) => {
   const handlePassword = async (e) => {
     e.preventDefault();
     let result = await axios.put(
-      `http://localhost:8088/codeSnippetManager/users/${cookies.get("UserID")}`,
+      `http://localhost:8088/codeSnippetManager/users/${getUserCookies()}`,
       password,
-      config
+      config()
     );
     setPassword({
       currPassword: "",
@@ -94,7 +89,7 @@ const Profile = ({ cookies }) => {
   };
   return (
     <React.Fragment>
-      <NavigationBar cookies={cookies} />
+      <NavigationBar />
       <h1>Profile</h1>
       <Box
         sx={{

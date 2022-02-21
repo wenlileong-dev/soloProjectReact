@@ -4,13 +4,11 @@ import Grid from "@mui/material/Grid";
 import { Link } from "react-router-dom";
 import Button from "@mui/material/Button";
 
-function handleClick(event) {
-  event.preventDefault();
-}
-const NavigationBar = ({ cookies }) => {
+import { removeAuthCookies } from "./../../routes";
+
+const NavigationBar = () => {
   const handleLogout = () => {
-    cookies.remove("Authorization");
-    cookies.remove("UserID");
+    removeAuthCookies();
     window.location.href = "/";
   };
   return (
