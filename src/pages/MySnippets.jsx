@@ -33,11 +33,12 @@ const MySnippet = ({ cookies }) => {
     }
   };
 
-  const getUserSnippets = async () => {
-    let result = await axios.get(
+  const getUserSnippets = async (selectTagList) => {
+    let result = await axios.post(
       `http://localhost:8088/codeSnippetManager/code/my/${cookies.get(
         "UserID"
       )}`,
+      { tagName: selectTagList },
       config
     );
     if (result.status === 200) {
@@ -50,9 +51,8 @@ const MySnippet = ({ cookies }) => {
       navigate("/auth");
     } else {
       getAllTags();
-      getUserSnippets();
+      getUserSnippets(selectTagList);
     }
-    console.log(selectTagList);
     // TODO GET Request to filter code snippets by selected tags
   }, [selectTagList]);
   const addTag = (tag) => {

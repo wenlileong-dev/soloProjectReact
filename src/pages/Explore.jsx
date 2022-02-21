@@ -32,25 +32,26 @@ const Explore = ({ cookies }) => {
     }
   };
 
-  const getAllCodes = async () => {
-    let result = await axios.get(
-      "http://localhost:8088/codeSnippetManager/code",
+  const getAllCodes = async (selectTagList) => {
+    let result = await axios.post(
+      "http://localhost:8088/codeSnippetManager/code/all",
+      { tagName: selectTagList },
       config
     );
     if (result.status === 200) {
+      // console.log(selectTagList);
       setAllCodes(result.data);
     }
   };
 
   useEffect(() => {
-    console.log(cookies.get("UerID"));
+    // console.log(cookies.get("UerID"));
     if (!cookies.get("UserID")) {
       navigate("/auth");
     } else {
       getAllTags();
-      getAllCodes();
+      getAllCodes(selectTagList);
     }
-    console.log(selectTagList);
     // TODO GET Request to filter code snippets by selected tags
   }, [selectTagList, cookies]);
 
