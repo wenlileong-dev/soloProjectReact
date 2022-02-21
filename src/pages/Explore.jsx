@@ -35,12 +35,13 @@ const Explore = ({ cookies }) => {
   const getAllCodes = async (selectTagList) => {
     let result = await axios.post(
       "http://localhost:8088/codeSnippetManager/code/all",
-      { tagName: selectTagList },
+      { tagName: selectTagList, userId: cookies.get("UserID") },
       config
     );
     if (result.status === 200) {
       // console.log(selectTagList);
       setAllCodes(result.data);
+      console.log(result.data);
     }
   };
 

@@ -38,7 +38,7 @@ const MySnippet = ({ cookies }) => {
       `http://localhost:8088/codeSnippetManager/code/my/${cookies.get(
         "UserID"
       )}`,
-      { tagName: selectTagList },
+      { tagName: selectTagList, userId: cookies.get("UserID") },
       config
     );
     if (result.status === 200) {

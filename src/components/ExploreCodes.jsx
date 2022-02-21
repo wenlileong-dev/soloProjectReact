@@ -31,7 +31,7 @@ const ExpandMore = styled((props) => {
 
 const ExploreCodes = (props) => {
   const [expanded, setExpanded] = useState(false);
-  const [isFavourite, setIsFavourite] = useState(false);
+  // const [isFavourite, setIsFavourite] = useState(false);
   const [editOpen, setEditOpen] = React.useState(false);
   const handleEditOpen = () => setEditOpen(true);
   const handleEditClose = () => setEditOpen(false);
@@ -46,9 +46,28 @@ const ExploreCodes = (props) => {
     setExpanded(!expanded);
   };
 
-  const handleFavourite = () => {
-    setIsFavourite(!isFavourite);
-    // TODO add to favourite
+  const handleFavourite = async () => {
+    if (!props.code.favourite) {
+      let result = await axios.get(
+        `http://localhost:8088/codeSnippetManager/code/favourite/${props.cookies.get(
+          "UserID"
+        )}/${props.code.id}`,
+        config
+      );
+      if (result.status === 200) {
+        window.location.href = "/explore";
+      }
+    } else {
+      let result = await axios.delete(
+        `http://localhost:8088/codeSnippetManager/code/favourite/${props.cookies.get(
+          "UserID"
+        )}/${props.code.id}`,
+        config
+      );
+      if (result.status === 200) {
+        window.location.href = "/explore";
+      }
+    }
   };
 
   const handleDelete = async () => {
@@ -78,13 +97,38 @@ const ExploreCodes = (props) => {
             </Stack>
           </CardContent>
           <CardActions disableSpacing>
-            <IconButton aria-label="add to favorites">
-              {isFavourite ? (
-                <FavoriteIcon onClick={handleFavourite} />
-              ) : (
-                <FavoriteBorderIcon onClick={handleFavourite} />
-              )}
-            </IconButton>
+            {props.code.currUserAuthor ? (
+              <Stack
+                spacing={3}
+                direction="row"
+                // justifyContent="center"
+                // alignItems="center"
+                // mt={3}
+              >
+                <Button
+                  onClick={handleEditOpen}
+                  size="small"
+                  variant="contained"
+                >
+                  Update
+                </Button>
+                <Button onClick={handleDelete} size="small" variant="outlined">
+                  Delete
+                </Button>
+              </Stack>
+            ) : (
+              <IconButton
+                aria-label="add to favorites"
+                onClick={handleFavourite}
+              >
+                {props.code.favourite ? (
+                  <FavoriteIcon />
+                ) : (
+                  <FavoriteBorderIcon />
+                )}
+              </IconButton>
+            )}
+
             <ExpandMore
               expand={expanded}
               onClick={handleExpandClick}
@@ -108,20 +152,6 @@ const ExploreCodes = (props) => {
                     "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
                 }}
               />
-              <Stack
-                spacing={3}
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-                mt={3}
-              >
-                <Button onClick={handleEditOpen} variant="contained">
-                  Update
-                </Button>
-                <Button onClick={handleDelete} variant="outlined">
-                  Delete
-                </Button>
-              </Stack>
             </CardContent>
           </Collapse>
           <EditCodeSnippet
