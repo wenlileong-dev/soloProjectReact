@@ -8,13 +8,19 @@ import TextField from "@mui/material/TextField";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
+import Alert from "@mui/material/Alert";
 
-const EditCodeSnippet = ({ open, handleClose, cookies, prevcode }) => {
+import { config, getUserCookies, baseURL } from "./../routes";
+
+const EditCodeSnippet = ({ open, handleClose, prevcode }) => {
   const [title, setTitle] = useState(prevcode.title);
   const [description, setDescription] = useState(prevcode.description);
   const [code, setCode] = useState(prevcode.code);
   const [tagName, setcodeTags] = useState(prevcode.tagName);
   const [tags, setTags] = useState([]);
+  const [isError, setIsError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
   const style = {
     position: "absolute",
     top: "50%",
@@ -27,17 +33,8 @@ const EditCodeSnippet = ({ open, handleClose, cookies, prevcode }) => {
     p: 4,
   };
 
-  let config = {
-    headers: {
-      Authorization: cookies.get("Authorization"),
-    },
-  };
-
   const getAllTags = async () => {
-    let result = await axios.get(
-      "http://localhost:8088/codeSnippetManager/code/tags",
-      config
-    );
+    let result = await axios.get(`${baseURL}/code/tags`, config());
     if (result.status === 200) {
       setTags(result.data);
     }
@@ -45,15 +42,18 @@ const EditCodeSnippet = ({ open, handleClose, cookies, prevcode }) => {
 
   const handleEdit = async (e) => {
     e.preventDefault();
-    let userId = cookies.get("UserID");
+    let userId = getUserCookies();
     let codeSnippet = { title, description, code, tagName, userId };
     let result = await axios.put(
-      `http://localhost:8088/codeSnippetManager/code/my/${prevcode.id}`,
+      `${baseURL}/code/my/${prevcode.id}`,
       codeSnippet,
-      config
+      config()
     );
-    if (result.status === 200) {
-      window.location.href = "/mySnippet";
+    if (result.status === 200 && result.data.status === "success") {
+      window.location.reload(false);
+    } else {
+      setIsError(true);
+      setErrorMsg(result.data.msg);
     }
   };
 
@@ -61,12 +61,7 @@ const EditCodeSnippet = ({ open, handleClose, cookies, prevcode }) => {
     getAllTags();
   }, []);
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
+    <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
         <form autoComplete="off" onSubmit={handleEdit}>
           <Grid
@@ -76,9 +71,13 @@ const EditCodeSnippet = ({ open, handleClose, cookies, prevcode }) => {
             justifyContent="center"
             alignItems="center"
           >
+            {isError && (
+              <Alert severity="error" sx={{ width: "60%" }}>
+                {errorMsg}
+              </Alert>
+            )}
             <Grid item xs={9}>
               <TextField
-                id="outlined-basic"
                 label="Title"
                 variant="outlined"
                 fullWidth
@@ -90,7 +89,6 @@ const EditCodeSnippet = ({ open, handleClose, cookies, prevcode }) => {
             </Grid>
             <Grid item xs={9}>
               <TextField
-                id="outlined-basic"
                 label="Description"
                 variant="outlined"
                 fullWidth
@@ -118,7 +116,6 @@ const EditCodeSnippet = ({ open, handleClose, cookies, prevcode }) => {
             <Grid item xs={9}>
               <Autocomplete
                 multiple
-                id="tags-filled"
                 options={tags.map((option) => option.name)}
                 freeSolo
                 defaultValue={tagName}

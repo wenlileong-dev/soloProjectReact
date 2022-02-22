@@ -9,58 +9,51 @@ import CodeEditor from "@uiw/react-textarea-code-editor";
 import Chip from "@mui/material/Chip";
 import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 
-// var tags = require("./../data/tagsFile.json");
+import { config, getUserCookies, baseURL } from "./../routes";
 
-const Create = ({ cookies }) => {
+const Create = () => {
   let navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [code, setCode] = useState(`System.out.println("Hello World")`);
   const [codetags, setcodeTags] = useState([]);
   const [tags, setTags] = useState([]);
-
-  let config = {
-    headers: {
-      Authorization: cookies.get("Authorization"),
-    },
-  };
+  const [isError, setIsError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const getAllTags = async () => {
-    let result = await axios.get(
-      "http://localhost:8088/codeSnippetManager/code/tags",
-      config
-    );
+    let result = await axios.get(`${baseURL}/code/tags`, config());
     if (result.status === 200) {
       setTags(result.data);
     }
   };
 
   useEffect(() => {
-    if (!cookies.get("UserID")) {
+    if (!getUserCookies()) {
       navigate("/auth");
     } else {
       getAllTags();
     }
-  }, []);
+  }, [navigate]);
 
   const createCodeSnippet = async (e) => {
     e.preventDefault();
-    let userId = cookies.get("UserID");
+    let userId = getUserCookies();
     let codeSnippet = { title, description, code, tagName: codetags, userId };
-    let result = await axios.post(
-      "http://localhost:8088/codeSnippetManager/code",
-      codeSnippet,
-      config
-    );
-    if (result.status === 200) {
+    let result = await axios.post(`${baseURL}/code`, codeSnippet, config());
+    if (result.status === 200 && result.data.status === "success") {
       window.location.href = "/explore";
+    } else {
+      setIsError(true);
+      setErrorMsg(result.data.msg);
     }
   };
 
   return (
     <React.Fragment>
-      <NavigationBar cookies={cookies} />
+      <NavigationBar />
       <Box sx={{ flexGrow: 1 }} mt={3}>
         <form onSubmit={createCodeSnippet} autoComplete="off">
           <Grid
@@ -70,9 +63,13 @@ const Create = ({ cookies }) => {
             justifyContent="center"
             alignItems="center"
           >
+            {isError && (
+              <Alert severity="error" sx={{ width: "60%" }}>
+                {errorMsg}
+              </Alert>
+            )}
             <Grid item xs={9}>
               <TextField
-                id="outlined-basic"
                 label="Title"
                 variant="outlined"
                 fullWidth
@@ -84,7 +81,6 @@ const Create = ({ cookies }) => {
             </Grid>
             <Grid item xs={9}>
               <TextField
-                id="outlined-basic"
                 label="Description"
                 variant="outlined"
                 fullWidth

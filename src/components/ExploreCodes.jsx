@@ -18,6 +18,8 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import EditCodeSnippet from "./EditCodeSnippet";
 
+import { config, getUserCookies, baseURL } from "./../routes";
+
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -31,16 +33,9 @@ const ExpandMore = styled((props) => {
 
 const ExploreCodes = (props) => {
   const [expanded, setExpanded] = useState(false);
-  // const [isFavourite, setIsFavourite] = useState(false);
   const [editOpen, setEditOpen] = React.useState(false);
   const handleEditOpen = () => setEditOpen(true);
   const handleEditClose = () => setEditOpen(false);
-
-  let config = {
-    headers: {
-      Authorization: props.cookies.get("Authorization"),
-    },
-  };
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -49,38 +44,33 @@ const ExploreCodes = (props) => {
   const handleFavourite = async () => {
     if (!props.code.favourite) {
       let result = await axios.get(
-        `http://localhost:8088/codeSnippetManager/code/favourite/${props.cookies.get(
-          "UserID"
-        )}/${props.code.id}`,
-        config
+        `${baseURL}/code/favourite/${getUserCookies()}/${props.code.id}`,
+        config()
       );
       if (result.status === 200) {
-        window.location.href = "/explore";
+        props.setFavouriteClick(!props.favouriteClick);
       }
     } else {
       let result = await axios.delete(
-        `http://localhost:8088/codeSnippetManager/code/favourite/${props.cookies.get(
-          "UserID"
-        )}/${props.code.id}`,
-        config
+        `${baseURL}/code/favourite/${getUserCookies()}/${props.code.id}`,
+        config()
       );
       if (result.status === 200) {
-        window.location.href = "/explore";
+        props.setFavouriteClick(!props.favouriteClick);
       }
     }
   };
 
   const handleDelete = async () => {
     let result = await axios.delete(
-      `http://localhost:8088/codeSnippetManager/code/my/${props.cookies.get(
-        "UserID"
-      )}/${props.code.id}`,
-      config
+      `${baseURL}/code/my/${getUserCookies()}/${props.code.id}`,
+      config()
     );
     if (result.status === 200) {
-      window.location.href = "/mySnippet";
+      window.location.reload(false);
     }
   };
+
   return (
     <React.Fragment>
       <Grid item xs={12} md={6}>
@@ -91,20 +81,14 @@ const ExploreCodes = (props) => {
               {props.code.description}
             </Typography>
             <Stack direction="row" spacing={1}>
-              {props.code.tagName.map((tag) => {
-                return <Chip label={tag} />;
+              {props.code.tagName.map((tag, i) => {
+                return <Chip label={tag} key={`tag${i}`} />;
               })}
             </Stack>
           </CardContent>
           <CardActions disableSpacing>
             {props.code.currUserAuthor ? (
-              <Stack
-                spacing={3}
-                direction="row"
-                // justifyContent="center"
-                // alignItems="center"
-                // mt={3}
-              >
+              <Stack spacing={3} direction="row">
                 <Button
                   onClick={handleEditOpen}
                   size="small"
@@ -158,7 +142,6 @@ const ExploreCodes = (props) => {
             open={editOpen}
             handleClose={handleEditClose}
             prevcode={props.code}
-            cookies={props.cookies}
           />
         </Card>
       </Grid>

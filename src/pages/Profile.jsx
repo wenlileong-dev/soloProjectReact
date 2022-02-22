@@ -15,40 +15,18 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
 import Alert from "@mui/material/Alert";
 
-const Profile = ({ cookies }) => {
+import {
+  config,
+  getUserCookies,
+  removeAuthCookies,
+  baseURL,
+} from "./../routes";
+
+const Profile = () => {
   let navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [isError, setError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
-  let config = {
-    headers: {
-      Authorization: cookies.get("Authorization"),
-    },
-  };
-
-  const getUserDetails = async () => {
-    let result = await axios.get(
-      `http://localhost:8088/codeSnippetManager/users/${cookies.get("UserID")}`,
-      config
-    );
-    if (result.status === 200) {
-      setEmail(result.data.email);
-    } else {
-      cookies.remove("Authorization");
-      cookies.remove("UserID");
-      window.location.href = "/";
-    }
-  };
-
-  useEffect(() => {
-    if (!cookies.get("UserID")) {
-      navigate("/auth");
-    } else {
-      getUserDetails();
-    }
-  }, []);
-
   const [password, setPassword] = useState({
     currPassword: "",
     newPassword: "",
@@ -60,6 +38,27 @@ const Profile = ({ cookies }) => {
     showNewPassword: false,
     showRepeatNewPassword: false,
   });
+
+  const getUserDetails = async () => {
+    let result = await axios.get(
+      `${baseURL}/users/${getUserCookies()}`,
+      config()
+    );
+    if (result.status === 200) {
+      setEmail(result.data.email);
+    } else {
+      removeAuthCookies();
+      window.location.href = "/";
+    }
+  };
+
+  useEffect(() => {
+    if (!getUserCookies()) {
+      navigate("/auth");
+    } else {
+      getUserDetails();
+    }
+  }, [navigate]);
 
   const handleChange = (prop) => (event) => {
     setPassword({ ...password, [prop]: event.target.value });
@@ -76,9 +75,9 @@ const Profile = ({ cookies }) => {
   const handlePassword = async (e) => {
     e.preventDefault();
     let result = await axios.put(
-      `http://localhost:8088/codeSnippetManager/users/${cookies.get("UserID")}`,
+      `${baseURL}/users/${getUserCookies()}`,
       password,
-      config
+      config()
     );
     setPassword({
       currPassword: "",
@@ -94,7 +93,7 @@ const Profile = ({ cookies }) => {
   };
   return (
     <React.Fragment>
-      <NavigationBar cookies={cookies} />
+      <NavigationBar />
       <h1>Profile</h1>
       <Box
         sx={{
@@ -105,12 +104,7 @@ const Profile = ({ cookies }) => {
       >
         <form onSubmit={handlePassword}>
           <Stack spacing={3} justifyContent="center" alignItems="center">
-            <TextField
-              disabled
-              id="outlined-disabled"
-              label="Email"
-              value={email}
-            />
+            <TextField disabled label="Email" value={email} />
             {isError && (
               <Alert severity="error" sx={{ width: "50ch" }}>
                 {errorMsg}
@@ -122,7 +116,6 @@ const Profile = ({ cookies }) => {
                 Current Password
               </InputLabel>
               <OutlinedInput
-                id="outlined-adornment-password"
                 type={passwordVisibly.showCurrPassword ? "text" : "password"}
                 value={password.currPassword}
                 onChange={handleChange("currPassword")}
@@ -151,7 +144,6 @@ const Profile = ({ cookies }) => {
                 New Password
               </InputLabel>
               <OutlinedInput
-                id="outlined-adornment-password"
                 type={passwordVisibly.showNewPassword ? "text" : "password"}
                 value={password.newPassword}
                 onChange={handleChange("newPassword")}
@@ -179,7 +171,6 @@ const Profile = ({ cookies }) => {
                 Repeat New Password
               </InputLabel>
               <OutlinedInput
-                id="outlined-adornment-password"
                 type={
                   passwordVisibly.showRepeatNewPassword ? "text" : "password"
                 }

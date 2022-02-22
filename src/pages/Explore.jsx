@@ -1,32 +1,24 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import NavigationBar from "../components/nav/NavigationBar";
-// import allCodes from "./../data/codesFile.json";
+import axios from "axios";
 
-import ExploreCodes from "../components/ExploreCodes";
 import Grid from "@mui/material/Grid";
-// import tags from "../data/tagsFile.json";
 import Stack from "@mui/material/Stack";
-import ExploreTags from "../components/ExploreTags";
 
-const Explore = ({ cookies }) => {
+import NavigationBar from "../components/nav/NavigationBar";
+import ExploreCodes from "../components/ExploreCodes";
+import ExploreTags from "../components/ExploreTags";
+import { config, getUserCookies, baseURL } from "./../routes";
+
+const Explore = () => {
   let navigate = useNavigate();
   const [selectTagList, setSelectTagList] = useState([]);
   const [allCodes, setAllCodes] = useState([]);
   const [tags, setTags] = useState([]);
-
-  let config = {
-    headers: {
-      Authorization: cookies.get("Authorization"),
-    },
-  };
+  const [favouriteClick, setFavouriteClick] = useState(false);
 
   const getAllTags = async () => {
-    let result = await axios.get(
-      "http://localhost:8088/codeSnippetManager/code/tags",
-      config
-    );
+    let result = await axios.get(`${baseURL}/code/tags`, config());
     if (result.status === 200) {
       setTags(result.data);
     }
@@ -34,27 +26,23 @@ const Explore = ({ cookies }) => {
 
   const getAllCodes = async (selectTagList) => {
     let result = await axios.post(
-      "http://localhost:8088/codeSnippetManager/code/all",
-      { tagName: selectTagList, userId: cookies.get("UserID") },
-      config
+      `${baseURL}/code/all`,
+      { tagName: selectTagList, userId: getUserCookies() },
+      config()
     );
     if (result.status === 200) {
-      // console.log(selectTagList);
       setAllCodes(result.data);
-      console.log(result.data);
     }
   };
 
   useEffect(() => {
-    // console.log(cookies.get("UerID"));
-    if (!cookies.get("UserID")) {
+    if (!getUserCookies()) {
       navigate("/auth");
     } else {
       getAllTags();
       getAllCodes(selectTagList);
     }
-    // TODO GET Request to filter code snippets by selected tags
-  }, [selectTagList, cookies]);
+  }, [selectTagList, navigate, favouriteClick]);
 
   const addTag = (tag) => {
     setSelectTagList([...selectTagList, tag]);
@@ -66,18 +54,28 @@ const Explore = ({ cookies }) => {
 
   return (
     <React.Fragment>
-      <NavigationBar cookies={cookies} />
+      <NavigationBar />
       <Stack direction="row" spacing={2} mt={3} mb={3}>
-        {tags.map((tag) => {
+        {tags.map((tag, i) => {
           return (
-            <ExploreTags tag={tag.name} addTag={addTag} removeTag={removeTag} />
+            <ExploreTags
+              tag={tag.name}
+              addTag={addTag}
+              removeTag={removeTag}
+              key={`exploreTag: ${i}`}
+            />
           );
         })}
       </Stack>
       <Grid container spacing={2}>
         {allCodes.map((code, i) => {
           return (
-            <ExploreCodes code={code} key={`explore: ${i}`} cookies={cookies} />
+            <ExploreCodes
+              code={code}
+              setFavouriteClick={setFavouriteClick}
+              favouriteClick={favouriteClick}
+              key={`explore: ${i}`}
+            />
           );
         })}
       </Grid>

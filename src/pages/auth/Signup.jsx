@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import axios from "axios";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import axios from "axios";
+import Alert from "@mui/material/Alert";
+
+import { baseURL } from "./../../routes";
 
 const style = {
   position: "absolute",
@@ -17,30 +20,36 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
+
 const Singup = ({ open, handleClose }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
   const handleSignUp = async (e) => {
     e.preventDefault();
     let user = { username, email, password };
-    let result = await axios.post(
-      "http://localhost:8088/codeSnippetManager/users",
-      user
-    );
+    let result = await axios.post(`${baseURL}/users`, user);
+    if (result.data.status === "success") {
+      clearInput();
+      window.location.href = "/";
+    } else {
+      clearInput();
+      setIsError(true);
+      setErrorMsg(result.data.msg);
+    }
+  };
+
+  const clearInput = () => {
     setUsername("");
     setEmail("");
     setPassword("");
-    window.location.href = "/";
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
+    <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
         <h1 className="center">Sign Up</h1>
         <form autoComplete="off" onSubmit={handleSignUp}>
@@ -51,6 +60,11 @@ const Singup = ({ open, handleClose }) => {
             spacing={3}
             mt={3}
           >
+            {isError && (
+              <Alert severity="error" sx={{ width: "60%" }}>
+                {errorMsg}
+              </Alert>
+            )}
             <TextField
               label="Username"
               variant="outlined"

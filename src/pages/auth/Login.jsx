@@ -1,32 +1,41 @@
 import React, { useState } from "react";
+import axios from "axios";
+
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import axios from "axios";
+import Alert from "@mui/material/Alert";
 
+import { setAuthCookies, baseURL } from "./../../routes";
 import Signup from "./Signup";
 import "./auth.css";
 
-const Login = ({ cookies }) => {
+const Login = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     let user = { email, password };
-    let result = await axios.post(
-      "http://localhost:8088/codeSnippetManager/users/login",
-      user
-    );
-    cookies.set("Authorization", result.headers.authorization);
-    cookies.set("UserID", result.headers.userid);
+    try {
+      let result = await axios.post(`${baseURL}/users/login`, user);
+      setAuthCookies(result.headers.authorization, result.headers.userid);
+      clearInput();
+      window.location.href = "/";
+    } catch (error) {
+      setIsError(true);
+      clearInput();
+    }
+  };
+
+  const clearInput = () => {
     setEmail("");
     setPassword("");
-    window.location.href = "/";
   };
 
   return (
@@ -36,13 +45,19 @@ const Login = ({ cookies }) => {
         className="center"
       >
         <h1>Login</h1>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} autoComplete="off">
           <Stack
             direction="column"
             justifyContent="center"
             alignItems="center"
             spacing={3}
           >
+            {isError && (
+              <Alert severity="error" sx={{ width: "60%" }}>
+                Invalid email or password
+              </Alert>
+            )}
+
             <TextField
               label="Email"
               variant="outlined"
