@@ -48,7 +48,7 @@ const ExploreCodes = (props) => {
         config()
       );
       if (result.status === 200) {
-        window.location.reload(false);
+        props.setFavouriteClick(!props.favouriteClick);
       }
     } else {
       let result = await axios.delete(
@@ -56,7 +56,7 @@ const ExploreCodes = (props) => {
         config()
       );
       if (result.status === 200) {
-        window.location.reload(false);
+        props.setFavouriteClick(!props.favouriteClick);
       }
     }
   };

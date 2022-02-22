@@ -15,6 +15,7 @@ const MySnippet = () => {
   const [selectTagList, setSelectTagList] = useState([]);
   const [tags, setTags] = useState([]);
   const [allCodes, setAllCodes] = useState([]);
+  const [favouriteClick, setFavouriteClick] = useState(false);
 
   const getAllTags = async () => {
     let result = await axios.get(`${baseURL}/code/tags`, config());
@@ -41,7 +42,7 @@ const MySnippet = () => {
       getAllTags();
       getUserSnippets(selectTagList);
     }
-  }, [selectTagList, navigate]);
+  }, [selectTagList, navigate, favouriteClick]);
 
   const addTag = (tag) => {
     setSelectTagList([...selectTagList, tag]);
@@ -68,7 +69,14 @@ const MySnippet = () => {
       </Stack>
       <Grid container spacing={2}>
         {allCodes.map((code, i) => {
-          return <ExploreCodes code={code} key={`explore: ${i}`} />;
+          return (
+            <ExploreCodes
+              code={code}
+              key={`explore: ${i}`}
+              setFavouriteClick={setFavouriteClick}
+              favouriteClick={favouriteClick}
+            />
+          );
         })}
       </Grid>
     </React.Fragment>

@@ -9,6 +9,7 @@ import CodeEditor from "@uiw/react-textarea-code-editor";
 import Chip from "@mui/material/Chip";
 import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 
 import { config, getUserCookies, baseURL } from "./../routes";
 
@@ -19,6 +20,8 @@ const Create = () => {
   const [code, setCode] = useState(`System.out.println("Hello World")`);
   const [codetags, setcodeTags] = useState([]);
   const [tags, setTags] = useState([]);
+  const [isError, setIsError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const getAllTags = async () => {
     let result = await axios.get(`${baseURL}/code/tags`, config());
@@ -40,8 +43,11 @@ const Create = () => {
     let userId = getUserCookies();
     let codeSnippet = { title, description, code, tagName: codetags, userId };
     let result = await axios.post(`${baseURL}/code`, codeSnippet, config());
-    if (result.status === 200) {
+    if (result.status === 200 && result.data.status === "success") {
       window.location.href = "/explore";
+    } else {
+      setIsError(true);
+      setErrorMsg(result.data.msg);
     }
   };
 
@@ -57,6 +63,11 @@ const Create = () => {
             justifyContent="center"
             alignItems="center"
           >
+            {isError && (
+              <Alert severity="error" sx={{ width: "60%" }}>
+                {errorMsg}
+              </Alert>
+            )}
             <Grid item xs={9}>
               <TextField
                 label="Title"

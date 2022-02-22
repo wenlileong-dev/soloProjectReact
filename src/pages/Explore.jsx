@@ -15,6 +15,7 @@ const Explore = () => {
   const [selectTagList, setSelectTagList] = useState([]);
   const [allCodes, setAllCodes] = useState([]);
   const [tags, setTags] = useState([]);
+  const [favouriteClick, setFavouriteClick] = useState(false);
 
   const getAllTags = async () => {
     let result = await axios.get(`${baseURL}/code/tags`, config());
@@ -41,7 +42,7 @@ const Explore = () => {
       getAllTags();
       getAllCodes(selectTagList);
     }
-  }, [selectTagList, navigate]);
+  }, [selectTagList, navigate, favouriteClick]);
 
   const addTag = (tag) => {
     setSelectTagList([...selectTagList, tag]);
@@ -68,7 +69,14 @@ const Explore = () => {
       </Stack>
       <Grid container spacing={2}>
         {allCodes.map((code, i) => {
-          return <ExploreCodes code={code} key={`explore: ${i}`} />;
+          return (
+            <ExploreCodes
+              code={code}
+              setFavouriteClick={setFavouriteClick}
+              favouriteClick={favouriteClick}
+              key={`explore: ${i}`}
+            />
+          );
         })}
       </Grid>
     </React.Fragment>

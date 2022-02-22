@@ -8,6 +8,7 @@ import TextField from "@mui/material/TextField";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
+import Alert from "@mui/material/Alert";
 
 import { config, getUserCookies, baseURL } from "./../routes";
 
@@ -17,6 +18,8 @@ const EditCodeSnippet = ({ open, handleClose, prevcode }) => {
   const [code, setCode] = useState(prevcode.code);
   const [tagName, setcodeTags] = useState(prevcode.tagName);
   const [tags, setTags] = useState([]);
+  const [isError, setIsError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const style = {
     position: "absolute",
@@ -46,8 +49,11 @@ const EditCodeSnippet = ({ open, handleClose, prevcode }) => {
       codeSnippet,
       config()
     );
-    if (result.status === 200) {
+    if (result.status === 200 && result.data.status === "success") {
       window.location.reload(false);
+    } else {
+      setIsError(true);
+      setErrorMsg(result.data.msg);
     }
   };
 
@@ -65,6 +71,11 @@ const EditCodeSnippet = ({ open, handleClose, prevcode }) => {
             justifyContent="center"
             alignItems="center"
           >
+            {isError && (
+              <Alert severity="error" sx={{ width: "60%" }}>
+                {errorMsg}
+              </Alert>
+            )}
             <Grid item xs={9}>
               <TextField
                 label="Title"
