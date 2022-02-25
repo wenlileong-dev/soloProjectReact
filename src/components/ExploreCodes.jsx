@@ -110,6 +110,9 @@ const ExploreCodes = (props) => {
                 ) : (
                   <FavoriteBorderIcon />
                 )}
+                {props.code.numFavourite > 0 && (
+                  <span>{props.code.numFavourite}</span>
+                )}
               </IconButton>
             )}
 
